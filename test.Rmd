@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 x <- c("data.table", "dplyr", "broom", "ggplot2", "usethis", "sf")
 lapply(x, require, character.only=TRUE)
 
+#test
 
 ```
 
