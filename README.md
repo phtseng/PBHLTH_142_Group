@@ -55,19 +55,19 @@ To make your report look presentable, check out this cheat sheet style guide on 
 
 
 ### Integrate Github and Git with RStudio
-###### Github
+##### Github
 1) Create an account on Github
 2) Find our group by clicking on this link https://github.com/phtseng/PBHLTH_142_Group
 3) On the top left corn, you can "pin" (like a bookmark), "watch" (or follow), or "fork" (creates a copy) of this in your own page
 4) If you pin, the group will show up in your profile, Then navigate to the PBHLTH_142_Group's master page simply by clicking the PBHLTH_142_Group hyperlink.
 
-###### Git
+##### Git
 1) Download Git https://git-scm.com/downloads, select all the recommended or default steps to install Git
 2) After it downloaded, open the command prompt then set your global username and email address by typing in
   git config --global user.name "Your Name"
   git config --global user.email
 
-###### RStudio
+##### RStudio
 1) Click on "Tools" > "Global Options" > Git/SVN to make sure your git is set up properly
 2) In your environment console, you should now see a "Git" tab
 3) Click on "Git" and clone this master/default main page to retreive the full repository
