@@ -1,8 +1,5 @@
-# PBHLTH_142_Group Project
-
-
-Questions:
-
+# PBHLTH_142_Group Project 1
+### Questions:
 
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying
 to answer and let us know what type of question this is in terms of the PPDAC framework.
@@ -56,4 +53,37 @@ rows. Given that this may be your first time importing data, we recommend you ch
 smaller!
 To make your report look presentable, check out this cheat sheet style guide on .rmd.
 
+
+### Integrate Github and Git with RStudio
+###### Github
+1) Create an account on Github
+2) Find our group by clicking on this link https://github.com/phtseng/PBHLTH_142_Group
+3) On the top left corn, you can "pin" (like a bookmark), "watch" (or follow), or "fork" (creates a copy) of this in your own page
+4) If you pin, the group will show up in your profile, Then navigate to the PBHLTH_142_Group's master page simply by clicking the PBHLTH_142_Group hyperlink.
+
+###### Git
+1) Download Git https://git-scm.com/downloads, select all the recommended or default steps to install Git
+2) After it downloaded, open the command prompt then set your global username and email address by typing in
+  git config --global user.name "Your Name"
+  git config --global user.email
+
+###### RStudio
+1) Click on "Tools" > "Global Options" > Git/SVN to make sure your git is set up properly
+2) In your environment console, you should now see a "Git" tab
+3) Click on "Git" and clone this master/default main page to retreive the full repository
+    git clone [https://github.com/phtseng/PBHLTH_142_Group/tree/master]
+4) Under the master/default main page, you can create a new branch or go to Terminal in RStudio and type in 
+    git branch [branch name]
+5) Check the status and that the branch is created
+    git branch
+    git status
+6) In Rstudio environment console, check that you're on the right branch and it's pointing to it locally.
+ Git cheat sheet: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/viewer.html?pdfurl=https%3A%2F%2Feducation.github.com%2Fgit-cheat-sheet-education.pdf&clen=100194&chunk=true
+ 7) Then you want to add a file to this branch. Create a new test file like "hello_world.R" and in the code insert 
+   print("Hello World!")
+ 8) Save then go to the Terminal in RStudio, make sure you add then push and finally commit the file
+    git add .
+    git push origin head
+    git commit -m "my hello_world.R test file"
+  9) Go back to Github to check for your new file, push, and commit
 
