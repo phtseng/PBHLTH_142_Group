@@ -9,21 +9,35 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-# load the libraries
-x <- c("data.table", "readxl", "dplyr", "broom", "ggplot2", "usethis", "sf")
+# load the libraries using the lapply function
+x <-
+  c("data.table",
+    "readxl",
+    "dplyr",
+    "broom",
+    "ggplot2",
+    "usethis",
+    "sf")
 
-lapply(x, require, character.only=TRUE)
+lapply(x, require, character.only = TRUE)
 
-sti_data <- read_xlsx("sti_data.xlsx", sheet="2000-2014")
-View(sti_data)
+# Use the read_xlsx function to read in the data set and the excel sheet then assign it to object sti_data
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+
+View(sti_data) #check the data out using View
+
 str(sti_data)
 ```
 
 ## Questions:
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
+
 2. [2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?
+
 3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
+
 4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data.
+
 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
 
 ## Question 6
@@ -32,15 +46,13 @@ i) What are the dimensions of the dataset?
 ii) Provide a list of variable names.
 iii) Print the first six rows of the dataset.
 
-```{r Question6, include = FALSE}
+```{r Question6, include = TRUE}
 #i) What are the dimensions of the dataset?
-dim(sti_data)
+dim(sti_data) #returns 23400 rows and 11 columns
 #ii) Provide a list of variable names.
-names(sti_data)
+names(sti_data) 
 #iii) Print the first six rows of the dataset.
 head(sti_data)
-top_n(6)
-
 ```
 ## Question 7
 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
