@@ -1,6 +1,7 @@
 ---
-title: "test"
-author: "Phuong"
+title: "Data Project Part 1"
+author: "Samuel Johnson," 
+        "Samantha Sears, Catalina Kornblueh Perez, Phuong Tseng, Carri Beshears"
 date: "2022/2/12"
 output: html_document
 ---
