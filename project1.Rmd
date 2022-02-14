@@ -1,19 +1,23 @@
 ---
 title: "Data Project Part 1"
-author: "Samuel Johnson," 
-        "Samantha Sears, Catalina Kornblueh Perez, Phuong Tseng, Carri Beshears"
+author: "Phuong Tseng"
 date: "2022/2/12"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# set up the packages
 x <- c("data.table", "dplyr", "broom", "ggplot2", "usethis", "sf")
 lapply(x, require, character.only=TRUE)
+
 
 sti_data <- readxl::read_xlsx("sti_data.xlsx", sheet="2000-2014")
 View(sti_data)
 str(sti_data)
+dim(sti_data)
+names(sti_data)
+
 ```
 
 ## R Markdown
