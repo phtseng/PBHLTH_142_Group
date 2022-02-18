@@ -1,8 +1,11 @@
 ---
 title: "Data Project Part 1"
-author: "Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong Tseng"
+author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
+  Tseng
 date: "2022/2/12"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ## Questions:
 
