@@ -53,6 +53,7 @@ dim(sti_data) #returns 23400 rows and 11 columns
 names(sti_data) 
 #iii) Print the first six rows of the dataset.
 head(sti_data)
+#test
 ```
 ## Question 7
 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
