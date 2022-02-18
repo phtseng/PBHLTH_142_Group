@@ -36,7 +36,16 @@ str(sti_data)
 
 3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
 
+The sampling frame used CDC STI data from 2000-2014. This sampling frame is appropriate to the question 
+because it gives specific information about state, sex, STI, year, and population. 
+Groups to generalize:Sexually active male/female in the US during years of 2000-14. 
+Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F
+And does not differentiate between sexual preferances.
+
 4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data.
+
+We pulled this dataset from this cdc website: https://wonder.cdc.gov/std.html.
+
 
 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
 
@@ -53,7 +62,6 @@ dim(sti_data) #returns 23400 rows and 11 columns
 names(sti_data) 
 #iii) Print the first six rows of the dataset.
 head(sti_data)
-#test2
 ```
 ## Question 7
 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
