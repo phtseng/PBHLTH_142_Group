@@ -22,11 +22,12 @@ And does not differentiate between sexual preferences.
 
 We pulled this dataset from this cdc website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
 
+
+
 #### Set up the packages
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-# load the libraries using the lapply function
 x <-
   c("data.table",
     "readxl",
@@ -38,34 +39,41 @@ x <-
 
 lapply(x, require, character.only = TRUE)
 ```
+To load the libraries that we need without repeating the library function, we used the lapply function in R to load them all at once.
 
-5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
 
+##### 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
 ```{r Import Data}
-# Use the read_xlsx function to read in the data set and the excel sheet then assign it to object sti_data
 sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+```
+We use the read_xlsx function to read in the data set and specify the excel sheet then assign it to an object called <b>sti_data</b>.
+
+
+#### Question 6
+##### 6. [3 marks] Use code in R to answer the following questions:
+##### i) What are the dimensions of the dataset?
+```{r Question 6i, include = TRUE}
+dim(sti_data) #returns 23400 rows and 11 columns
 ```
 
 
-### Question 6
-6. [3 marks] Use code in R to answer the following questions:
-i) What are the dimensions of the dataset?
-ii) Provide a list of variable names.
-iii) Print the first six rows of the dataset.
+##### ii) Provide a list of variable names.
+```{r Question 6ii, include = TRUE}
+names(sti_data)
+```
 
-```{r Question 6, include = TRUE}
-#i) What are the dimensions of the dataset?
-dim(sti_data) #returns 23400 rows and 11 columns
-#ii) Provide a list of variable names.
-names(sti_data) 
-#iii) Print the first six rows of the dataset.
+
+##### iii) Print the first six rows of the dataset.
+```{r Question 6iii, include = TRUE}
 head(sti_data)
 ```
 
-### Question 7
-7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
+
+#### Question 7
+##### 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
 
 ```{r statistical concept from Part 1, echo=FALSE}
 
 ```
-### Explanation
+
+#### Explanation

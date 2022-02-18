@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Phuong Tseng" />
+<meta name="author" content="Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong Tseng" />
 
 
 <title>Data Project Part 1</title>
@@ -363,15 +363,12 @@ summary {
 
 
 <h1 class="title toc-ignore">Data Project Part 1</h1>
-<h4 class="author">Phuong Tseng</h4>
+<h4 class="author">Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong Tseng</h4>
 <h4 class="date">2022/2/12</h4>
 
 </div>
 
 
-<div id="set-up-the-packages" class="section level2">
-<h2>Set up the packages</h2>
-</div>
 <div id="questions" class="section level2">
 <h2>Questions:</h2>
 <ol style="list-style-type: decimal">
@@ -379,35 +376,40 @@ summary {
 <li><p>[2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?</p></li>
 <li><p>[2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.</p></li>
 </ol>
-<p>The sampling frame used CDC STI data from 2000-2014. This sampling frame is appropriate to the question because it gives specific information about state, sex, STI, year, and population. Groups to generalize:Sexually active male/female in the US during years of 2000-14. Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F And does not differentiate between sexual preferances.</p>
+<p>The sampling frame used CDC STI data from 2000-2014. This sampling frame is appropriate to the question because it gives specific information about state, sex, STI, year, and population. Groups to generalize:Sexually active male/female in the US during years of 2000-14. Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F And does not differentiate between sexual preferences.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>[2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data.</li>
 </ol>
-<p>We pulled this dataset from this cdc website: <a href="https://wonder.cdc.gov/std.html" class="uri">https://wonder.cdc.gov/std.html</a>.</p>
-<ol start="5" style="list-style-type: decimal">
-<li>[1 mark] Write code below to import your data into R. Assign your dataset to an object.</li>
-</ol>
+<p>We pulled this dataset from this cdc website: <a href="https://wonder.cdc.gov/std.html" class="uri">https://wonder.cdc.gov/std.html</a>. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the “Data Request” link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.</p>
+<div id="set-up-the-packages" class="section level4">
+<h4>Set up the packages</h4>
+<p>To load the libraries that we need without repeating the library function, we used the lapply function in R to load them all at once.</p>
+<div id="mark-write-code-below-to-import-your-data-into-r.-assign-your-dataset-to-an-object." class="section level5">
+<h5>5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.</h5>
+<pre class="r"><code>sti_data &lt;- read_xlsx(&quot;sti_data.xlsx&quot;, sheet = &quot;2000-2014&quot;)</code></pre>
+<p>We use the read_xlsx function to read in the data set and specify the excel sheet then assign it to an object called <b>sti_data</b>.</p>
 </div>
-<div id="question-6" class="section level2">
-<h2>Question 6</h2>
-<ol start="6" style="list-style-type: decimal">
-<li>[3 marks] Use code in R to answer the following questions:</li>
-</ol>
-<ol style="list-style-type: lower-roman">
-<li>What are the dimensions of the dataset?</li>
-<li>Provide a list of variable names.</li>
-<li>Print the first six rows of the dataset.</li>
-</ol>
-<pre class="r"><code>#i) What are the dimensions of the dataset?
-dim(sti_data) #returns 23400 rows and 11 columns</code></pre>
+</div>
+<div id="question-6" class="section level4">
+<h4>Question 6</h4>
+<div id="marks-use-code-in-r-to-answer-the-following-questions" class="section level5">
+<h5>6. [3 marks] Use code in R to answer the following questions:</h5>
+</div>
+<div id="i-what-are-the-dimensions-of-the-dataset" class="section level5">
+<h5>i) What are the dimensions of the dataset?</h5>
+<pre class="r"><code>dim(sti_data) #returns 23400 rows and 11 columns</code></pre>
 <pre><code>## [1] 23400    11</code></pre>
-<pre class="r"><code>#ii) Provide a list of variable names.
-names(sti_data) </code></pre>
+</div>
+<div id="ii-provide-a-list-of-variable-names." class="section level5">
+<h5>ii) Provide a list of variable names.</h5>
+<pre class="r"><code>names(sti_data)</code></pre>
 <pre><code>##  [1] &quot;Year&quot;         &quot;Year Code&quot;    &quot;State&quot;        &quot;State Code&quot;   &quot;Gender&quot;      
 ##  [6] &quot;Gender Code&quot;  &quot;Disease&quot;      &quot;Disease Code&quot; &quot;Count&quot;        &quot;Population&quot;  
 ## [11] &quot;Rate&quot;</code></pre>
-<pre class="r"><code>#iii) Print the first six rows of the dataset.
-head(sti_data)</code></pre>
+</div>
+<div id="iii-print-the-first-six-rows-of-the-dataset." class="section level5">
+<h5>iii) Print the first six rows of the dataset.</h5>
+<pre class="r"><code>head(sti_data)</code></pre>
 <pre><code>## # A tibble: 6 x 11
 ##    Year `Year Code` State `State Code` Gender `Gender Code` Disease
 ##   &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;  
@@ -420,13 +422,15 @@ head(sti_data)</code></pre>
 ## # ... with 4 more variables: `Disease Code` &lt;dbl&gt;, Count &lt;chr&gt;,
 ## #   Population &lt;chr&gt;, Rate &lt;chr&gt;</code></pre>
 </div>
-<div id="question-7" class="section level2">
-<h2>Question 7</h2>
-<ol start="7" style="list-style-type: decimal">
-<li>[4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.</li>
-</ol>
-<div id="explanation" class="section level3">
-<h3>Explanation</h3>
+</div>
+<div id="question-7" class="section level4">
+<h4>Question 7</h4>
+<div id="marks-use-the-data-to-demonstrate-a-statistical-concept-from-part-i-of-the-course.-describe-the-concept-that-you-are-demonstrating-and-interpret-the-findings.-this-should-be-a-combination-of-code-and-written-explanation." class="section level5">
+<h5>7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.</h5>
+</div>
+</div>
+<div id="explanation" class="section level4">
+<h4>Explanation</h4>
 </div>
 </div>
 
