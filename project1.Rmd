@@ -41,6 +41,7 @@ x <-
     "sf")
 
 lapply(x, require, character.only = TRUE)
+#tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
 ```
 To load the libraries that we need without repeating the library function, we used the lapply function in R to load them all at once.
 
