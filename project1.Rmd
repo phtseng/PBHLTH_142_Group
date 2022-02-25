@@ -4,14 +4,24 @@ author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuo
   Tseng
 date: "2022/2/12"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ## Questions:
 
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
 
+Our team will be looking at infection rates of chlamydia in California from (2000-2014)* for overall trends as well as comparisons of infection rates between reported genders. We will seek to answer: did infection rates for chlamydia in California increase or decline from (2000-2014)* and are there notable differences in infection rates within reported genders? This question will be a descriptive problem as part of the PPDAC framework.
+*What specific date range do we want to focus on?
+
+
 2. [2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?
+
+The target population is sexually active persons with chlamydia in California. Chlamydia is a common 
+sexually transmitted infection reported in the U.S. that impacts the health of the infected and represents 
+an economic cost for all individuals directly or indirectly. Therefore, the data analysis is helpful in public 
+health in the areas of prevention, control, and policymaking.
+
 
 3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
 
@@ -19,9 +29,9 @@ The sampling frame used CDC STI data from 2000-2014. This sampling frame is appr
 because it gives specific information about state, sex, STI, year, and population. 
 Groups to generalize:Sexually active male/female in the US during years of 2000-14. 
 Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F
-And does not differentiate between sexual preferences.
+And does not differentiate between sexual preferences. We also don't want to generalize this data set beyond 2014 since the data set has data up to this period.
 
-4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data.
+4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data. 
 
 We pulled this dataset from this cdc website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
 
@@ -76,8 +86,37 @@ head(sti_data)
 #### Question 7
 ##### 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
 
-```{r statistical concept from Part 1, echo=FALSE}
+We could use ggplot2 library to create possible histogram of count by state or by year.
 
+
+Filter the data set to only show: California, our target date range, and chlamydia
+Create a dodged bar chart filled by gender that shows rate over year
+Line graph (Cases vs Year & Rate vsYear) by gender.  (Makes sense? -Catalina)
+
+
+```{r statistical concept from Part 1, echo=FALSE}
+sti_data_plot <- ggplot(sti_data, aes()) + geom_histogram()
+sti_data_ca <- sti_data %>% select(State,Year, Count,Gender,Disease) %>% filter(State=="California")
+ca_plot <- ggplot(sti_data_ca, aes(x = Year , y = Count, fill = Gender)) + geom_bar(stat="identity") + facet_wrap(~Gender)
+ca_plot
+
+sti_data_ca$Gender_X <- 0
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Female")] <- 1
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Male")] <- 2
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Unknown")] <- 0
+
+sti_data_ca$Count[which(sti_data_ca$Count=="Not Applicable")] <- NA
+
+test <- sti_data_ca %>% filter(Gender ==c("Female", "Male") | Disease ==c("Total Syphilis", "Chancroid", "Chlamydia", "Gonorrhea"))
+
+
+plot2x <- ggplot(test, aes(x = Year, y = Count, fill = Gender)) +  geom_bar(stat="identity",   position="stack") + facet_wrap(~Disease)
+
+plot2x
+
+View(plot2)
+
+#4 graphs by disease and Gender, State, Disease, Count
 ```
 
 #### Explanation
