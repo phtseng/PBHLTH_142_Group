@@ -118,7 +118,7 @@ View(plot2)
 
 #4 graphs by disease and Gender, State, Disease, Count
 ```
-```{r Sam J}
+```{r California}
 # Package
 require(gridExtra)
 
@@ -149,7 +149,143 @@ Data = summarize(Data, TotalCount = sum(Count))
 P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
 
 # Arrange Into Grid
-grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="California.png")
 ```
+```{r Alabama}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "Alabama")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Alabama Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="Alabama.png")
+```
+```{r Colorado}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "Colorado")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Colorado Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="Colorado.png")
+```
+```{r Colorado}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "Texas")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Texas Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="Texas.png")
+```
+```{r Sam J}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + facet_wrap(~State) + theme(strip.text.x = element_text(margin = margin(2, 0, 2, 0)))
+P1
+
+# Save
+ggsave(P1, file="AllStates.png")
 ```
 #### Explanation
