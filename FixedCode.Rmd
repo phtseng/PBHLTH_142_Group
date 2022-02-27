@@ -1,0 +1,73 @@
+---
+title: "Data Project Part 1"
+author: "Samuel Johnson,Samantha Sears,Catalina Kornblueh Perez,Phuong Tseng,Carri Beshears"
+date: "2/12/2022"
+output: pdf_document
+---
+
+**1. Installing Libaries**
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(faraway)
+library(tidyr)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+library(stringr)
+library(forcats)
+library(broom)
+```
+
+**2. Importing Data**
+```{r}
+Data = readr::read_csv("combined_csv.csv")
+```
+
+**3. Display Names**
+```{r}
+Names = names(Data)
+Names
+```
+
+**4. Display Dimensions**
+```{r}
+Dimensions = dim(Data)
+Dimensions
+```
+
+**5. Display Header**
+```{r}
+Header = head(Data)
+Header
+```
+
+**6. Rename Variables**
+```{r}
+Data = dplyr::rename(Data,
+                     year=Year,
+                     year_code="Year Code",
+                     state=State,
+                     state_code="State Code",
+                     gender="Gender",
+                     gender_code="Gender Code",
+                     disease=Disease,
+                     disease_code="Disease Code",
+                     count=Count,
+                     population=Population)
+```
+
+**7. Linear Regression**
+I want to create a linear model to determine the relationship between an individual with chlamydia, as well as categorical and continuous factors such as year, the population of their state, and their gender. I do not know how each of these variables will interact, so will first run a saturated ANCOVA model to gauge statistical significance of each factor. To do this, we need to first filter the data set to contain only instances of chlamydia. Also, to normalize the data, we need to create a precentage based varibale.
+
+```{r}
+chlamydia_data <- dplyr::filter(Data, disease=="Chlamydia",gender != "Unknown", population != "Not Applicable", year < 1985, state == "California") #%>% group_by(state) %>% dplyr::summarize(test = mean(Rate))
+
+AAA = mean(chlamydia_data$population)
+#saturated_anova = aov(count ~ gender*population, data = chlamydia_data)
+#tidy(saturated_anova)
+```
+
+```{r}
+#linear_model = lm(count ~ population + gender, data = chlamydia_data)
+#plot(linear_model)
+```
