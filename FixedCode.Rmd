@@ -1,73 +1,155 @@
 ---
 title: "Data Project Part 1"
-author: "Samuel Johnson,Samantha Sears,Catalina Kornblueh Perez,Phuong Tseng,Carri Beshears"
-date: "2/12/2022"
-output: pdf_document
+author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
+  Tseng
+date: "2022/2/12"
+output:
+  html_document: default
+  pdf_document: default
 ---
+## Questions:
 
-**1. Installing Libaries**
-```{r}
+1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
+
+Our team will be looking at infection rates of chlamydia in California from (2000-2014)* for overall trends as well as comparisons of infection rates between reported genders. We will seek to answer: did infection rates for chlamydia in California increase or decline from (2000-2014)* and are there notable differences in infection rates within reported genders? This question will be a descriptive problem as part of the PPDAC framework.
+*What specific date range do we want to focus on?
+
+
+2. [2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?
+
+The target population is sexually active persons with chlamydia in California. Chlamydia is a common 
+sexually transmitted infection reported in the U.S. that impacts the health of the infected and represents 
+an economic cost for all individuals directly or indirectly. Therefore, the data analysis is helpful in public 
+health in the areas of prevention, control, and policymaking.
+
+
+3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
+
+The sampling frame used CDC STI data from 2000-2014. This sampling frame is appropriate to the question 
+because it gives specific information about state, sex, STI, year, and population. 
+Groups to generalize:Sexually active male/female in the US during years of 2000-14. 
+Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F
+And does not differentiate between sexual preferences. We also don't want to generalize this data set beyond 2014 since the data set has data up to this period.
+
+4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data. 
+
+We pulled this dataset from this cdc website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
+
+
+
+#### Set up the packages
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(faraway)
-library(tidyr)
-library(dplyr)
-library(knitr)
-library(ggplot2)
-library(stringr)
-library(forcats)
-library(broom)
+
+x <-
+  c("data.table",
+    "readxl",
+    "dplyr",
+    "broom",
+    "ggplot2",
+    "usethis",
+    "sf")
+
+lapply(x, require, character.only = TRUE)
+#tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
+```
+To load the libraries that we need without repeating the library function, we used the lapply function in R to load them all at once.
+
+
+##### 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
+```{r Import Data}
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+```
+We use the read_xlsx function to read in the data set and specify the excel sheet then assign it to an object called <b>sti_data</b>.
+
+
+#### Question 6
+##### 6. [3 marks] Use code in R to answer the following questions:
+##### i) What are the dimensions of the dataset?
+```{r Question 6i, include = TRUE}
+dim(sti_data) #returns 23400 rows and 11 columns
 ```
 
-**2. Importing Data**
-```{r}
-Data = readr::read_csv("combined_csv.csv")
+
+##### ii) Provide a list of variable names.
+```{r Question 6ii, include = TRUE}
+names(sti_data)
 ```
 
-**3. Display Names**
-```{r}
-Names = names(Data)
-Names
+
+##### iii) Print the first six rows of the dataset.
+```{r Question 6iii, include = TRUE}
+head(sti_data)
 ```
 
-**4. Display Dimensions**
-```{r}
-Dimensions = dim(Data)
-Dimensions
+
+#### Question 7
+##### 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
+
+We could use ggplot2 library to create possible histogram of count by state or by year.
+
+
+Filter the data set to only show: California, our target date range, and chlamydia
+Create a dodged bar chart filled by gender that shows rate over year
+Line graph (Cases vs Year & Rate vsYear) by gender.  (Makes sense? -Catalina)
+
+
+```{r statistical concept from Part 1, echo=FALSE}
+sti_data_plot <- ggplot(sti_data, aes()) + geom_histogram()
+sti_data_ca <- sti_data %>% select(State,Year, Count,Gender,Disease) %>% filter(State=="California")
+ca_plot <- ggplot(sti_data_ca, aes(x = Year , y = Count, fill = Gender)) + geom_bar(stat="identity") + facet_wrap(~Gender)
+ca_plot
+
+sti_data_ca$Gender_X <- 0
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Female")] <- 1
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Male")] <- 2
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Unknown")] <- 0
+
+sti_data_ca$Count[which(sti_data_ca$Count=="Not Applicable")] <- NA
+
+test <- sti_data_ca %>% filter(Gender ==c("Female", "Male") | Disease ==c("Total Syphilis", "Chancroid", "Chlamydia", "Gonorrhea"))
+
+
+plot2x <- ggplot(test, aes(x = Year, y = Count, fill = Gender)) +  geom_bar(stat="identity",   position="stack") + facet_wrap(~Disease)
+
+plot2x
+
+View(plot2)
+
+#4 graphs by disease and Gender, State, Disease, Count
 ```
+```{r Sam J}
+# Package
+require(gridExtra)
 
-**5. Display Header**
-```{r}
-Header = head(Data)
-Header
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "California")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of California Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 ```
-
-**6. Rename Variables**
-```{r}
-Data = dplyr::rename(Data,
-                     year=Year,
-                     year_code="Year Code",
-                     state=State,
-                     state_code="State Code",
-                     gender="Gender",
-                     gender_code="Gender Code",
-                     disease=Disease,
-                     disease_code="Disease Code",
-                     count=Count,
-                     population=Population)
 ```
-
-**7. Linear Regression**
-I want to create a linear model to determine the relationship between an individual with chlamydia, as well as categorical and continuous factors such as year, the population of their state, and their gender. I do not know how each of these variables will interact, so will first run a saturated ANCOVA model to gauge statistical significance of each factor. To do this, we need to first filter the data set to contain only instances of chlamydia. Also, to normalize the data, we need to create a precentage based varibale.
-
-```{r}
-chlamydia_data <- dplyr::filter(Data, disease=="Chlamydia",gender != "Unknown", population != "Not Applicable", year < 1985, state == "California") #%>% group_by(state) %>% dplyr::summarize(test = mean(Rate))
-
-AAA = mean(chlamydia_data$population)
-#saturated_anova = aov(count ~ gender*population, data = chlamydia_data)
-#tidy(saturated_anova)
-```
-
-```{r}
-#linear_model = lm(count ~ population + gender, data = chlamydia_data)
-#plot(linear_model)
-```
+#### Explanation
