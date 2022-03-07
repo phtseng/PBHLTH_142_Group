@@ -1,5 +1,5 @@
 ---
-title: "Data Project Part 1"
+title: "Data Project Part 2"
 author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
   Tseng
 date: "2022/2/12"
@@ -7,6 +7,8 @@ output:
   html_document: default
   pdf_document: default
 ---
+
+# Part 1
 ## Questions:
 
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
@@ -118,5 +120,134 @@ View(plot2)
 
 #4 graphs by disease and Gender, State, Disease, Count
 ```
+```{r California}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "California")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of California Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="California.png")
+```
+```{r Alabama}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "New York")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of New York Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="NewYork.png")
+```
+```{r Colorado}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data  = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "Texas")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Texas Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="Texas.png")
+```
 
 #### Explanation
+
+# Part II
+In Part II of the data project, you will demonstrate a statistical concept from Part II of the course (material
+on midterm II, Chapters 9-12 of Baldi & Moore).
+You should be using the same dataset for Part II that you used in part I.
+
+Questions:
+1. [1 mark] Include your work for Part I.
+2. [2 marks] Describe a quantity you will estimate as an outcome in your problem using probability
+notation. Are you planning to calculate marginal probabilities? Conditional probabilities?
+3. [3 marks] Describe the type of theoretical distribution that is relevant for your data.
+i) What type of variable(s) are you investigating (continuous, categorical, ordinal, etc)?
+ii) What theoretical distribution that we have talked about would potentially be appropriate to use with
+these data (Normal, Binomial, Poisson. . . )
+iii) Why is this an appropriate model for the data you are studying?
+4. [4 marks] Use the data you have to demonstrate a statistical concept from Part II of the course. Describe
+the concept that you are demonstrating and interpret the findings. This may include code in R, a visual
+of some kind and text interpretation.
