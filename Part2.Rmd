@@ -96,30 +96,7 @@ Create a dodged bar chart filled by gender that shows rate over year
 Line graph (Cases vs Year & Rate vsYear) by gender.  (Makes sense? -Catalina)
 
 
-```{r statistical concept from Part 1, echo=FALSE}
-sti_data_plot <- ggplot(sti_data, aes()) + geom_histogram()
-sti_data_ca <- sti_data %>% select(State,Year, Count,Gender,Disease) %>% filter(State=="California")
-ca_plot <- ggplot(sti_data_ca, aes(x = Year , y = Count, fill = Gender)) + geom_bar(stat="identity") + facet_wrap(~Gender)
-ca_plot
-
-sti_data_ca$Gender_X <- 0
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Female")] <- 1
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Male")] <- 2
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Unknown")] <- 0
-
-sti_data_ca$Count[which(sti_data_ca$Count=="Not Applicable")] <- NA
-
-test <- sti_data_ca %>% filter(Gender ==c("Female", "Male") | Disease ==c("Total Syphilis", "Chancroid", "Chlamydia", "Gonorrhea"))
-
-
-plot2x <- ggplot(test, aes(x = Year, y = Count, fill = Gender)) +  geom_bar(stat="identity",   position="stack") + facet_wrap(~Disease)
-
-plot2x
-
-View(plot2)
-
 #4 graphs by disease and Gender, State, Disease, Count
-```
 ```{r California}
 # Package
 require(gridExtra)
@@ -157,6 +134,7 @@ Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 # Save
 ggsave(Plot, file="California.png")
 ```
+
 ```{r Alabama}
 # Package
 require(gridExtra)
