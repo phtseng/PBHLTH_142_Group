@@ -1,5 +1,5 @@
 ---
-title: "Data Project Part 2"
+title: "Data Project Part 1"
 author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
   Tseng
 date: "2022/2/12"
@@ -7,8 +7,6 @@ output:
   html_document: default
   pdf_document: default
 ---
-
-# Part 1
 ## Questions:
 
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
@@ -96,7 +94,30 @@ Create a dodged bar chart filled by gender that shows rate over year
 Line graph (Cases vs Year & Rate vsYear) by gender.  (Makes sense? -Catalina)
 
 
+```{r statistical concept from Part 1, echo=FALSE}
+sti_data_plot <- ggplot(sti_data, aes()) + geom_histogram()
+sti_data_ca <- sti_data %>% select(State,Year, Count,Gender,Disease) %>% filter(State=="California")
+ca_plot <- ggplot(sti_data_ca, aes(x = Year , y = Count, fill = Gender)) + geom_bar(stat="identity") + facet_wrap(~Gender)
+ca_plot
+
+sti_data_ca$Gender_X <- 0
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Female")] <- 1
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Male")] <- 2
+sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Unknown")] <- 0
+
+sti_data_ca$Count[which(sti_data_ca$Count=="Not Applicable")] <- NA
+
+test <- sti_data_ca %>% filter(Gender ==c("Female", "Male") | Disease ==c("Total Syphilis", "Chancroid", "Chlamydia", "Gonorrhea"))
+
+
+plot2x <- ggplot(test, aes(x = Year, y = Count, fill = Gender)) +  geom_bar(stat="identity",   position="stack") + facet_wrap(~Disease)
+
+plot2x
+
+View(plot2)
+
 #4 graphs by disease and Gender, State, Disease, Count
+```
 ```{r California}
 # Package
 require(gridExtra)
@@ -134,7 +155,6 @@ Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 # Save
 ggsave(Plot, file="California.png")
 ```
-
 ```{r Alabama}
 # Package
 require(gridExtra)
@@ -211,21 +231,3 @@ ggsave(Plot, file="Texas.png")
 ```
 
 #### Explanation
-
-# Part II
-In Part II of the data project, you will demonstrate a statistical concept from Part II of the course (material
-on midterm II, Chapters 9-12 of Baldi & Moore).
-You should be using the same dataset for Part II that you used in part I.
-
-Questions:
-1. [1 mark] Include your work for Part I.
-2. [2 marks] Describe a quantity you will estimate as an outcome in your problem using probability
-notation. Are you planning to calculate marginal probabilities? Conditional probabilities?
-3. [3 marks] Describe the type of theoretical distribution that is relevant for your data.
-i) What type of variable(s) are you investigating (continuous, categorical, ordinal, etc)?
-ii) What theoretical distribution that we have talked about would potentially be appropriate to use with
-these data (Normal, Binomial, Poisson. . . )
-iii) Why is this an appropriate model for the data you are studying?
-4. [4 marks] Use the data you have to demonstrate a statistical concept from Part II of the course. Describe
-the concept that you are demonstrating and interpret the findings. This may include code in R, a visual
-of some kind and text interpretation.
