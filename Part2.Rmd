@@ -4,42 +4,45 @@ author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuo
   Tseng
 date: "2022/2/12"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
+header-includes: \usepackage{epsfig,graphicx,graphics,amssymb,amsmath,latexsym,amsfonts,url,
+  lscape, multirow, color}
 ---
-## Questions:
+***Data Project Part 1***
 
 1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
 
-Our team will be looking at infection rates of chlamydia in California from (2000-2014)* for overall trends as well as comparisons of infection rates between reported genders. We will seek to answer: did infection rates for chlamydia in California increase or decline from (2000-2014)* and are there notable differences in infection rates within reported genders? This question will be a descriptive problem as part of the PPDAC framework.
-*What specific date range do we want to focus on?
+Our team will be looking at infection rates of, for example, Chlamydia in California from 2000-2014 for overall trends as well as comparisons of infection rates between reported genders. We will seek to answer: did infection rates for chlamydia in California increase or decline from 2000-2014 and are there notable differences in infection rates within reported genders? This question will be a descriptive problem as part of the PPDAC framework. Specifically, we will describe the probability and risk of any of the 10+ STIs that are tabulated, and compute a regression model to predict these values for 50 states, 2 genders, and 14 years. This regression model will be used to predict risk of each respective infection stratified by certain variables. This will be a large and comprehensive regression model built from a similarly large and comprehensive data set.
 
 
 2. [2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?
 
-The target population is sexually active persons with chlamydia in California. Chlamydia is a common 
-sexually transmitted infection reported in the U.S. that impacts the health of the infected and represents 
+The target population, for example in the case of chlamydia, is sexually active persons with chlamydia in California. Chlamydia is a common sexually transmitted infection reported in the U.S. that impacts the health of the infected and represents 
 an economic cost for all individuals directly or indirectly. Therefore, the data analysis is helpful in public 
-health in the areas of prevention, control, and policymaking.
+health in the areas of prevention, control, and policy making. This analysis will be extended for all 50 states and all genders to comprise over 10 common STI's. This comprehensive regression model can be used by all sexually active members of the general public to predict risk of infection based on year, gender, and state. This can be used to inform citizens of the risk and potential danger of sexually transmitted infections, as well as their prevalence.
 
 
 3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
 
-The sampling frame used CDC STI data from 2000-2014. This sampling frame is appropriate to the question 
-because it gives specific information about state, sex, STI, year, and population. 
-Groups to generalize:Sexually active male/female in the US during years of 2000-14. 
-Not comfortable generalizing with non-binary people and possibily MSM groups- because data only specifies M/F
-And does not differentiate between sexual preferences. We also don't want to generalize this data set beyond 2014 since the data set has data up to this period.
+The sampling frame used CDC STI data from 2000-2014 which consists of aggregated data reported to the CDC from trustworthy and validated sources. This sampling frame is appropriate to the question 
+because it gives specific information about state, sex, STI, year, and population, which are the variables we are looking to form descriptive regression with. 
+Groups to generalize include those who were sexually active male/female in the US during years of 2000-14, as well as possible extrapolation to predict a quantified risk to those members of a similar population who are exposed in the mid 2020's. 
+We are not comfortable generalizing with non-binary people and possibly MSM groups- because data only specifies M/F
+And does not differentiate between sexual preferences. Although the data is only tabulated until 2014, if there appears to be a strong correlation and identifiability, we could propose outside validity in order to draw informed predictions on current risks.
 
 4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data. 
 
-We pulled this dataset from this cdc website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
+We pulled this dataset from this CDC website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
+
+The corresponding data set is an aggregated and summarized tabulation from Sexually Transmitted Disease (STD) morbidity case reports  that have been annually reported to the National Center for HIV/AIDS, STD,  Viral Hepatitis, and TB Prevention. The Centers for Disease Control and Prevention, also known as the CDC, collected this data for all 50 United States as well as the District of Columbia, Puerto Rico, Virgin Islands, and the territory of Guam. Before being empirically tabulated, the number of cases and corresponding disease incidence rates were reported by year, the type of STD, and also the area of report. Furthermore, the data was further aggregated by gender, age group, and race/ethnicity.
 
 
 
 #### Set up the packages
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dpi=300,fig.width=8)
 
 x <-
   c("data.table",
@@ -48,12 +51,14 @@ x <-
     "broom",
     "ggplot2",
     "usethis",
-    "sf")
+    "sf",
+    "gridExtra",
+    "knitr")
 
 lapply(x, require, character.only = TRUE)
 #tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
 ```
-To load the libraries that we need without repeating the library function, we used the lapply function in R to load them all at once.
+To load the libraries that we need without repeating the library function, we used the lapply() function in R to load them all at once.
 
 
 ##### 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
@@ -67,7 +72,7 @@ We use the read_xlsx function to read in the data set and specify the excel shee
 ##### 6. [3 marks] Use code in R to answer the following questions:
 ##### i) What are the dimensions of the dataset?
 ```{r Question 6i, include = TRUE}
-dim(sti_data) #returns 23400 rows and 11 columns
+dim(sti_data) # Returns 23400 rows and 12 columns
 ```
 
 
@@ -86,44 +91,22 @@ head(sti_data)
 #### Question 7
 ##### 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
 
-We could use ggplot2 library to create possible histogram of count by state or by year.
+We will use ggplot to create a bar chart displaying Chlamydia count stratified by gender and sorted by year. To do this, we first clean the data set by filtering unwanted categorical variables and removing either incomplete or non-numeric entries. For the states of California, New York, and Texas, we have created distributions displaying our target population and stratified data. By grouping onto a single bar chart, we can see that there is clearly a correlation between gender and chlamydia rate, as well as year. Analyzing our results, it is empirically evident that cases are proportionally higher among females than their male counterparts, which can be seen in the total summation of all cases. Additionally, this trend is observable between all 3 states, and as subsequent years are analyzed (2000 - 2014), we can see that female chlamydia cases are of 2.5x more in quantity. There is a clear underlying causal relationship that results in this discrepancy.
 
+We can see, from looking at the below 3 plots as an example, that there is a clear trend between year, gender, and count of cases. Our project will explore this issue by creating a regression model that uses gender, year, and state to predict the probability of a specific disease in each specific state. This will be a very large and comprehensive model due to the fact that we have 24,000 rows consisting of over 10 distinct sexually transmitted diseases in over 50 states. From the plots below, we can see that the left skewed data by year correlates to an increase as year proceeds.The way our data is laid out is already aggregated to rates of chlamydia, so our outcome is a continuous variable - not binary. This works out well because we have a binary exposure and continuous outcome. 
 
-Filter the data set to only show: California, our target date range, and chlamydia
-Create a dodged bar chart filled by gender that shows rate over year
-Line graph (Cases vs Year & Rate vsYear) by gender.  (Makes sense? -Catalina)
+There are two prime statistical concepts that we are demonstrating here. First, by stratifying by geneder and plotting with respect to year, we can see that the relatinshio betweeb year and count of cases is reasonably linear. This can be seen by relatively consistent and linear increases in cases in California as the year progresses. This chart could be represented as a linear regression model, however we would see different slopes with respect to male and female.
 
+The second statistical concept we are demonstraing is that of the risk ratio, which is the ratio of the probability of an outcome in an exposed group to the probability of an outcome in an unexposed group. Assuming our two exposures are being male and female, and the outcome is having chlamydia, we can use the total value of cases stratified by gender computed by R. There are approximately 40 million people in California, roughly equating to 20 million men and 20 million women. We can use the equation 
+$RR = \frac{Risk_{Exposed}}{Risk_{Unexposed}}$. For women, the Relative Risk of contracting Chlamydia in 2014 is 1.76, which supports the fact that women are more at risk for Chlamydia. For men, respectively, this Risk Ratio is 0.5652.
 
-```{r statistical concept from Part 1, echo=FALSE}
-sti_data_plot <- ggplot(sti_data, aes()) + geom_histogram()
-sti_data_ca <- sti_data %>% select(State,Year, Count,Gender,Disease) %>% filter(State=="California")
-ca_plot <- ggplot(sti_data_ca, aes(x = Year , y = Count, fill = Gender)) + geom_bar(stat="identity") + facet_wrap(~Gender)
-ca_plot
-
-sti_data_ca$Gender_X <- 0
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Female")] <- 1
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Male")] <- 2
-sti_data_ca$Gender_X[which(sti_data_ca$Gender=="Unknown")] <- 0
-
-sti_data_ca$Count[which(sti_data_ca$Count=="Not Applicable")] <- NA
-
-test <- sti_data_ca %>% filter(Gender ==c("Female", "Male") | Disease ==c("Total Syphilis", "Chancroid", "Chlamydia", "Gonorrhea"))
-
-
-plot2x <- ggplot(test, aes(x = Year, y = Count, fill = Gender)) +  geom_bar(stat="identity",   position="stack") + facet_wrap(~Disease)
-
-plot2x
-
-View(plot2)
-
-#4 graphs by disease and Gender, State, Disease, Count
-```
+\newpage
 ```{r California}
 # Package
 require(gridExtra)
 
 # Clone CSV Table
-Data  = sti_data
+Data = sti_data
 
 # Filter
 Data = select (Data, State, Year, Count, Gender, Disease)
@@ -141,31 +124,40 @@ Data = na.omit(Data)
 Data = mutate(Data, Count = as.numeric(Count))
 
 # Distribution
-P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of California Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of California Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
 
 # Total
 Data = group_by(Data, Gender)
 Data = summarize(Data, TotalCount = sum(Count))
-P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
 
 # Arrange Into Grid
-grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 
 # Save
 ggsave(Plot, file="California.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 ```
-```{r Alabama}
+\newpage
+```{r New York}
 # Package
 require(gridExtra)
 
 # Clone CSV Table
-Data  = sti_data
+Data = sti_data
 
 # Filter
 Data = select (Data, State, Year, Count, Gender, Disease)
 
-# California
+# New York
 Data = filter(Data, State == "New York")
 
 # Chlamydia
@@ -178,31 +170,40 @@ Data = na.omit(Data)
 Data = mutate(Data, Count = as.numeric(Count))
 
 # Distribution
-P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of New York Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of New York Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
 
 # Total
 Data = group_by(Data, Gender)
 Data = summarize(Data, TotalCount = sum(Count))
-P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
 
 # Arrange Into Grid
-grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 
 # Save
 ggsave(Plot, file="NewYork.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 ```
-```{r Colorado}
+\newpage
+```{r Texas}
 # Package
 require(gridExtra)
 
 # Clone CSV Table
-Data  = sti_data
+Data = sti_data
 
 # Filter
 Data = select (Data, State, Year, Count, Gender, Disease)
 
-# California
+# Texas
 Data = filter(Data, State == "Texas")
 
 # Chlamydia
@@ -215,19 +216,54 @@ Data = na.omit(Data)
 Data = mutate(Data, Count = as.numeric(Count))
 
 # Distribution
-P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + labs(title = "Distribution of Texas Chlamydia Cases by Year",subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases") + theme(legend.position = "none")
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of Texas Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
 
 # Total
 Data = group_by(Data, Gender)
 Data = summarize(Data, TotalCount = sum(Count))
-P2 = ggplot(Data, aes(x = Gender, y = TotalCount)) + geom_bar(stat = "identity",aes(fill = Gender)) + labs(title = "Total", x = "Gender", y = "Number of Cases") + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
 
 # Arrange Into Grid
-grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
 
 # Save
 ggsave(Plot, file="Texas.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+```
+\newpage
+***Data Project Part 2***
+
+#### 1. [1 mark] Include your work for Part I.
+Data Project Part 1 is included above, and is contained on seperate pages. All code, plots, and analysis have not been changed. To ensure that are data is starting, once again, as the pure dataset, the following csv file has been read and imported once more.
+
+```{r Re Import Data}
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
 ```
 
-#### Explanation
+#### 2. [2 marks] Describe a quantity you will estimate as an outcome in your problem using probability notation. Are you planning to calculate marginal probabilities? Conditional probabilities?
+
+
+
+#### 3. [3 marks] Describe the type of theoretical distribution that is relevant for your data.
+#### i) What type of variable(s) are you investigating (continuous, categorical, ordinal, etc)?
+
+
+
+#### ii) What theoretical distribution that we have talked about would potentially be appropriate to use with these data (Normal, Binomial, Poisson. . . )
+
+
+
+#### iii) Why is this an appropriate model for the data you are studying?
+
+
+
+#### 4. [4 marks] Use the data you have to demonstrate a statistical concept from Part II of the course. Describe the concept that you are demonstrating and interpret the findings. This may include code in R, a visual of some kind and text interpretation.
+
