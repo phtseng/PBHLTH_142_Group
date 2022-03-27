@@ -249,21 +249,173 @@ sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
 ```
 
 #### 2. [2 marks] Describe a quantity you will estimate as an outcome in your problem using probability notation. Are you planning to calculate marginal probabilities? Conditional probabilities?
+There are multiple probabilities that we would like to calculate in our causal analysis. Due to the nature of the problem, a majority of these are conditional probabilities because we are analyzing certain groups and variables as opposed to the margins of our data set. All our probabilities will be focused on Chlamydia.
 
-
+The first of these probailities will be the conditional probability of Chlamydia incidence in each state given gender. To do this, we will first stratify and create a 2x2 table for all 50 states in order to make our analysis more thorough. Our simple first probability will be that of chlamydia given a gender. When stratifying to make seperate 2x2 tables these would technically be considered marginal probabilities, however our full table contains 50 rows for states and multiple columns for Chlamydia status and gender, so with respect to the entire data set these would still be conditional. This can be written in the form:
+$$ P(Chlamydia | Male) \ \ \mbox{and} \ \ P(Chlamydia | Female)$$
+The next probabilities we would like to calculate are the intersection between states and Chlamydia proportions, which we will want in order to directly compare states ratios to their counterparts. An example of this will be, what is the probability of being in Texas and having Chlamydia? This will be possible due to the fact that our data is tabulated by state and we have individual cases in order to calculate this probability. This can be written in the form:
+$$P(Chlamydia \cap Texas) \ \ \mbox{and} \ \ P(Chlamydia \cap Mississippi)$$
+Finally, we would like to combine the two in order to create stratum specific estimates and probabilities. This will combine both intersection of states and cases as well as gender. This will be written in the form:
+$$P(Chlamydia | Male \cap California) \ \ \mbox{or} \ \ P(Chlamydia | Female \cap Arizona)$$
+\newpage
 
 #### 3. [3 marks] Describe the type of theoretical distribution that is relevant for your data.
+
 #### i) What type of variable(s) are you investigating (continuous, categorical, ordinal, etc)?
 
+There are multiple variables being analyzed in our model.
 
+Year: Year is a number from 2000 to 2014. At first, this could be considered a discrete numeric value, however for the purposes of stratifying each case of chlamydia and seperating data into more manageable chunks, this actually behaves more as a categorical variable due to the fact that we are not performing time series analysis.
 
-#### ii) What theoretical distribution that we have talked about would potentially be appropriate to use with these data (Normal, Binomial, Poisson. . . )
+State: State contains markers for all 50 states plus certain districts such as the district of Columbia. This is a categorical variable however it is not ordinal because states are not ranked in any important tier based on value. Because of this, we have a nominal categorical variable.
 
+Gender: Gender is either Male, Female, or Unknown which represents data collected for a participant who did not leave a response. These are clearly nominal ordinal variables.
 
+Count: Count is a discrete numeric variable that represents the amount of positive cases of a given sti per state stratified by gender. This is discrete and not continuous because we only work with whole integers.
+
+Population: Population is also a discrete numeric variable.
+
+Proportion: Proportion is the only continuous numeric variable that we have in our data set. It is conitnous because it is typically under 0.01 and falls on an average of typically 0.0036575778. Proportion is always a continuous variable.
+
+#### ii) What theoretical distribution that we have talked about would potentially be appropriate to use with these data (Normal, Binomial, Poisson. . . )\newline
+
+Out of the three choices we have, we decided on the normal distribution being the best fit. This is because of the large quantity of measured data, as well as relative independence between each sample. Below is a plot of our proportions of Chlamydia cases by state. While there is presence of outliers, we have decided that the normal distribution is still the best and most appropriate theoretical distribution for our data.
+
+```{r}
+# Clone CSV Table
+Data = sti_data
+
+# Select Chlamydia
+Data = filter(Data, Disease == "Chlamydia", Gender != "Unknown")
+
+# Remove District Because Data Collectors Stated Errors in These States When Sampling
+Data = filter(Data, State != "District of Columbia")
+Data = filter(Data, State != "Alaska")
+Data = filter(Data, State != "Mississippi")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+Data = mutate(Data, Population = as.numeric(Population))
+
+# Create Proportion
+Data = mutate(Data, Proportion = Count/Population)
+
+# Plotting
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.0004)
+Plot = Plot + geom_density(col = "green", size = 1.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender)
+Plot
+```
 
 #### iii) Why is this an appropriate model for the data you are studying?
+There are 3 options for a theoretical distribution.
 
+First, we can initially posit that our distribution will most definitely not be Poisson. We can do this for multiple reasons. First, Chlamydia, although still being an STI, is nowhere near rare enough to be considered under the Poisson distribution. Likewise, the odds or probability of infection is not equal for each person, which violates an assumption we need in order to use the Poisson model. Finally, our model is a factor of multiple variables, and we do not have time series data to estimate either the number of cases per week/state, nor do we have a reasonable asusmption that each event of Chlamydia does not influence the chances of another event occuring. By definition, a sexually transmitted disease is transmitted more frequently when there are known to be more positive individuals.
 
+Our second candidate for a distribution is Binomia. At first glance, this would seem like a good choice do to the fact that our outcome is seemingly binary. We either have a 0 (not a case) or a 1 (a chlamydia case). Unfortunately, the Binomal distribution is not viable for multiple reasons. First, we do not have access to individual candidate data. Because of this, we can not determine the probability per person, but only per stata. This would mean that we cannot "choose" a number of people (k) from our sample of size n. Additionally, our model is complex to the point that we cannot simply treat our outcome as binary. Also, we cannot directly assume independence for states, as well as we do not have a fixed sample size to draw from. Our sample is effectively all of the united states. Because of this, we cannot say that we are visualizing a Binomial distribution.
 
+This leaves us with a normal distribution. We posit that the normal distribution is the appropriate theoretical distribution to use. First, we have an accumulutaion of over 1 million sample points that are simplified into a proportion for each state. Because of this, we can assume the mean of our proportional curve to be an unbiased estimator. This means that we can average our proportion and use this mean to be the estimator for average proportion for any given state. Here, we are effectively given an empirical normal distribution. Due to the size of our population, our theoretical distribution is normal due to the fact that we can assume indepencdence from each sample due to variation over state/county. Our theoretical assumption holds true for a few reasons. First, when plotting, we can see that the distribution if approximately symmetric. Second, we can see that it is asymptotic. Finally, we can also see that each distribution, when stratified by gender, is unimodal. Most importantly, our distribution meets the conditions of the 68 -95 - 98 rule, where each proportion of data is within 1,2, and 3 standard distributions respectively.
+
+When examining the true data below, we can see that it is approximately normal. Unfortunately, it seems that for both men and women the distribution is slightly right skewed due to outliers, however this is expected as our data is not perfect and can reflect real life inconsistencies. We also know that each sample is an SRS due to the method in which data was collected. Also looking at the data, we can see that while both are relatively normal, we can see that the standard distribution for women is much greater than that of men. This means that there is more variance in the female population. We can see this by the higher and less wide curve when stratified by gender and examining the male population.
+
+\newpage
 #### 4. [4 marks] Use the data you have to demonstrate a statistical concept from Part II of the course. Describe the concept that you are demonstrating and interpret the findings. This may include code in R, a visual of some kind and text interpretation.
+
+Below, We started with very simple calculations to understand our sampling proportion. We once again included our histogram to show normality of our data. From our tabulated values, we calculated a mean proportion for Females of 0.004975239 with a standard deviation of 0.0015581734. For Males, we calculated a mean proportion of 0.001778095 with a standard deviation of 0.0006937979 Looking at our theoretical distributions overlayed on the histogram, this very clearly explains the difference we see in each of their shapes. For Femails, the proportion of Chlamydia distributions is much wider and resembles the more typical standard normal curve. For males, we see an extremeley high peak with narrow variance which represents a smaller 95% confidence interval. The data tabulated supports and explains the visual assumptions we made. Next, we calculated a 95% margin of error corresponding to a 95% Confidence Interval of $0.004975239 \pm 0.0001126492$ for Women and a 95% Confidence Interval of $0.001778095 \pm 0.0000501586$ for Males.
+
+```{r}
+
+# By Gender
+Inference_Data = group_by(Data, Gender)
+Summary_Gender = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+Summary_Gender
+
+# By State
+Inference_Data = group_by(Data, State)
+Summary_State = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+print.data.frame(Summary_State)
+
+# Plot
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.0004)
+Plot = Plot + geom_density(col = "green", size = 1.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender)
+Plot
+
+```
+
+Ultimately, our goal is to create a t-test to test a desired null hypothesis, however before we do this, it is important to define normality of our plot. We can still use the t-test, however first we will create a QQ plot in order to analyze how well our data fits a normal curve. We will do this so we can visually determine the fit of our data in a method separate to simply looking at a histogram. Looking at the calculated QQ plots displayed, we can immediately see that our data is not perfectly normal. This is unfortunate, however we did not expect our data to be perfect. Looking at the quantile plots, we can see that they reinforce our initial observation of right-skewed data. For Females, the proportion is relatively normal before 3rd quartile/95% range where we lose normality drastically. This can bee seen in the histogram where data is skewed right. For Males, we can also see in the QQ plot that the data is not pefectly normal, in fact past the +2 quartile as well it is clear that the data is right skewed. Thankfully, we can confidently say that the *bulk* of the data, that mostly contained within the 95% confidence interval, is relatively normally distributed. The QQ plot is an important tool that can be used to interpret and define normality.
+
+```{r}
+QQ_Plot = ggplot(data = Data, aes(sample = Proportion)) 
+QQ_Plot = QQ_Plot + stat_qq() + stat_qq_line() 
+QQ_Plot = QQ_Plot + facet_wrap(~ Gender)
+QQ_Plot
+```
+Our next step is conducting a t-test. A t-test is a type of inferential statistic used in lecture to determine if there is a variance or significant deviation between the means of two groups, which in this case, is the mean of the sampling proportion of Chlamydia. This difference in mean is calculated using the t-test which may be related in certain features. The t-test is one of many tests used by statisticians and Public Health professionals for the purpose of hypothesis testing. There are multiple conditions that we must satisfy first before conducting a t-test. First, data must be from a SRS. Due to the method in which our data was sample (volunteered information) as well as the sheer size and scope of the CDC data, we can conclude that all samples were independent and this can be approximated as a SRS. Second, the data must be normally distributed and must be uni modal and symmetric. Using the QQ plot and histogram above, we can conclude that our data is relatively normal and can meet this condition. The 3rd and final condition is that our data must be of a "large" sample size. In lecture this was defined as anything greater than or equal to 40. We have data from 50 states, and each state has tens of thousands of cases. Thus, we clearly meet this condition with at least a million separate samples. One important factor we have to consider is skewed data. While our data definitely does have some right skewed behavior, we do not consider it major and can proceed with the t-test.
+
+Our t-test will be as follows. Based on our statistical analysis, we concluded that the mean proportion of Chlamydia over every state for Women was 0.004975239 and for Men was 0.001778095 Earlier in the problem, we made the decision to remove the categorical variable in state labeled "District of Colombia" because we wanted to focus or causal study on only the 50 states in America, not include a district. We also made the decision to remove this due to the fact that the sample size was relatively small compared to any other state, and it simply did not seem like a subset of the population that we could use to infer more about another state. This proportion is too small to effect the overall sampling mean due to the fact that it is only 1 of 50 states and only accounted for 40 out of the 400,000 + samples. Additionally, we wanted to remove this sample so we could reintroduce it later in order to run statistical analysis now. Focusing on the sampling from the District of Colombia, we see an average sampling proportion for women of 0.011115789, and an average sampling proportion of 0.004888704 for men. This is much higher than those seen as an average over all 50 states.
+
+```{r}
+District_Data = read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+
+# Filter for Chlamydia
+District_Data = filter(District_Data, Disease == "Chlamydia", Gender != "Unknown")
+
+# Remove NAN
+District_Data = na.omit(District_Data)
+
+# Confirm Numeric
+District_Data = mutate(District_Data, Count = as.numeric(Count))
+District_Data = mutate(District_Data, Population = as.numeric(Population))
+
+# Create Proportion
+District_Data = mutate(District_Data, Proportion = Count/Population)
+
+# Focus on District of Columbia
+District_Data = filter(District_Data, State == "District of Columbia")
+
+Inference_Data_District = group_by(District_Data, Gender)
+Summary = summarize(Inference_Data_District, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+Summary
+```
+
+However, is it an abnormally high sampling proportion? We would like to test the hypothesis that a mean sampling proportion for Chlamydia in the District of Colombia is actually abnormally high. To do this, we will test this against the null hypothesis that the mean is actually eaqual to the overall sampling proportion of 0.004975239 and 0.001778095 respectively. We will do this using a T-Test. Our Null Hypothesis is $H_0: \bar{p} = 0.004975239$ for women and $H_0: \bar{p} = 0.001778095$ for men. Our alternative hypothesis is $H_A: \bar{p} > 0.004975239$ for women and $H_A: \bar{p} > 0.001778095$ for men.
+
+```{r}
+# Stratify Data By Gender
+Male_Data = filter(District_Data, Gender == "Male")
+Female_Data = filter(District_Data, Gender == "Female")
+
+# Run T-Test
+Male_T_Test = t.test(x = Male_Data$Proportion, alternative = "greater", mu = 0.001778095)
+Female_T_Test = t.test(x = Female_Data$Proportion, alternative = "greater", mu = 0.004975239)
+```
+
+Running the T-Test on the Male proportion of the gender, we have a P-Value of 0.0005109 as our test statistic. This means that there is a 0.05109% chance that we observed this deviation of proportion in the District of Colombia due to chance. Because of this, we reject the null hypothesis and accept the fact that our data is accurate in this district. If we were to incorrectly make this estimate, then that would be a type 1 error which is an $\alpha$ error. What is our statistical power here? Using the normal distribution, we can determine what our power is using pnorm() using an $\alpha = 0.05$ which corresponds to 95%. Our power here is calculated as 0.8466444.
+```{r}
+District_Probability = 1 - pnorm(0.001906643, mean = 0.004888704, sd = 0.002917447)
+District_Probability
+
+Male_T_Test
+```
+Running the T-Test on the Female proportion of the gender, we have a P-Value of 3.456e-09 as our test statistic. This means that there is a 3.456e-07% chance that we observed this deviation of proportion in the District of Colombia due to chance. Because of this, we reject the null hypothesis and accept the fact that our data is accurate in this district. If we were to incorrectly make this estimate, then that would be a type 1 error which is an $\alpha$ error. What is our statistical power here? Using the normal distribution, we can determine what our power is using pnorm() using an $\alpha = 0.05$ which corresponds to 95%. Our power here is calculated as 0.9985881.
+```{r}
+
+District_Probability = 1 - pnorm(0.005334928, mean = 0.011115789, sd = 0.001935802)
+District_Probability
+
+
+Female_T_Test
+```
 
