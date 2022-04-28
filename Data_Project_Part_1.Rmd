@@ -53,7 +53,8 @@ x <-
     "usethis",
     "sf",
     "gridExtra",
-    "knitr")
+    "knitr",
+    "here")
 
 lapply(x, require, character.only = TRUE)
 #tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
@@ -79,11 +80,13 @@ dim(sti_data) # Returns 23400 rows and 12 columns
 ##### ii) Provide a list of variable names.
 ```{r Question 6ii, include = TRUE}
 names(sti_data)
+head(sti_data)
+
 ```
 
 
 ##### iii) Print the first six rows of the dataset.
-```{r Question 6iii, include = TRUE}
+```{r Question 6iii, eval=FALSE}
 head(sti_data)
 ```
 
@@ -303,6 +306,8 @@ Data = mutate(Data, Population = as.numeric(Population))
 # Create Proportion
 Data = mutate(Data, Proportion = Count/Population)
 
+str(Data)
+
 # Plotting
 Plot = ggplot(data = Data, aes(x = Proportion))
 Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.0004)
@@ -422,25 +427,39 @@ Female_T_Test
 *PART 3*
 ```{r}
 # Clone CSV Table
-Data = sti_data
+library(readxl)
 
-# Select Chlamydia
-Data = filter(Data, Disease == "Chlamydia", Gender != "Unknown")
+sti_data <- read_excel("/sti_data.xlsx", sheet = "2000-2014")
 
-# Remove District Because Data Collectors Stated Errors in These States When Sampling
-Data = filter(Data, State != "District of Columbia")
-Data = filter(Data, State != "Alaska")
-Data = filter(Data, State != "Mississippi")
+str(sti_data)
 
-# Remove NAN
-Data = na.omit(Data)
+# Select relevant columns and filter by Chlamydia excluding unknown genders
+df <-
+  sti_data %>%
+  select(ID, State, Gender, Disease, Count, Population, Rate) %>%
+  filter(Disease == "Chlamydia", Gender != "Unknown") %>% 
+  mutate(
+    Count = as.numeric(Count),
+    Population = as.numeric(Population),
+    Proportion = Count / Population)
 
-# Confirm Numeric
-Data = mutate(Data, Count = as.numeric(Count))
-Data = mutate(Data, Population = as.numeric(Population))
+View(df)
 
-# Create Proportion
-Data = mutate(Data, Proportion = Count/Population)
+# Remove District Because Data Collectors Stated Errors in These States When Sampling then Remove NAN
+df2 <-  filter(df, State != "District of Columbia", State != "Alaska", State != "Mississippi") %>% na.omit(df)
+
+# Confirm Numeric (removing this since it's in line 437)
+#Data = mutate(Count = as.numeric(Count), Population = as.numeric(Population))
+
+# Create Proportion (see line 37)
+#Data = mutate(Data, Proportion = Count/Population)
+
+table(df2$Gender=='Female')
+prop <- sum(df2$Count/df2$Population) #4.96
+#table(dependent = Disease, independent = Gender)
+#prop.test(x=c(735, 735), n=c(735 + 5 , 735 + 5))
+
+Data <- df2
 
 # Plotting
 Plot = ggplot(data = Data, aes(x = Proportion))
