@@ -1,0 +1,490 @@
+---
+title: "Data Project Part 1"
+author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
+  Tseng
+date: "2022/2/12"
+output:
+  pdf_document: default
+  html_document: default
+header-includes: \usepackage{epsfig,graphicx,graphics,amssymb,amsmath,latexsym,amsfonts,url,
+  lscape, multirow, color}
+---
+***Data Project Part 1***
+
+1. [2 marks] What is the problem your are addressing with these data? State the question you are trying to answer and let us know what type of question this is in terms of the PPDAC framework.
+
+Our team will be looking at infection rates of, for example, Chlamydia in California from 2000-2014 for overall trends as well as comparisons of infection rates between reported genders. We will seek to answer: did infection rates for chlamydia in California increase or decline from 2000-2014 and are there notable differences in infection rates within reported genders? This question will be a descriptive problem as part of the PPDAC framework. Specifically, we will describe the probability and risk of any of the 10+ STIs that are tabulated, and compute a regression model to predict these values for 50 states, 2 genders, and 14 years. This regression model will be used to predict risk of each respective infection stratified by certain variables. This will be a large and comprehensive regression model built from a similarly large and comprehensive data set.
+
+
+2. [2 marks] What is the target population for your project? Why was this target chosen i.e., what was your rationale for wanting to answer this question in this specific population?
+
+The target population, for example in the case of chlamydia, is sexually active persons with chlamydia in California. Chlamydia is a common sexually transmitted infection reported in the U.S. that impacts the health of the infected and represents 
+an economic cost for all individuals directly or indirectly. Therefore, the data analysis is helpful in public 
+health in the areas of prevention, control, and policy making. This analysis will be extended for all 50 states and all genders to comprise over 10 common STI's. This comprehensive regression model can be used by all sexually active members of the general public to predict risk of infection based on year, gender, and state. This can be used to inform citizens of the risk and potential danger of sexually transmitted infections, as well as their prevalence.
+
+
+3. [2 marks] What is the sampling frame used to collect the data you are using? Describe why you think this sampling strategy is appropriate for your question. To what group(s) would you feel comfortable generalizing the findings of your study and why.
+
+The sampling frame used CDC STI data from 2000-2014 which consists of aggregated data reported to the CDC from trustworthy and validated sources. This sampling frame is appropriate to the question 
+because it gives specific information about state, sex, STI, year, and population, which are the variables we are looking to form descriptive regression with. 
+Groups to generalize include those who were sexually active male/female in the US during years of 2000-14, as well as possible extrapolation to predict a quantified risk to those members of a similar population who are exposed in the mid 2020's. 
+We are not comfortable generalizing with non-binary people and possibly MSM groups- because data only specifies M/F
+And does not differentiate between sexual preferences. Although the data is only tabulated until 2014, if there appears to be a strong correlation and identifiability, we could propose outside validity in order to draw informed predictions on current risks.
+
+4. [2 marks] Write a brief description (1-4 sentences) of the source and contents of your dataset. Provide a URL to the original data source if applicable. If not (e.g., the data came from your internship), provide 1-2 sentences saying where the data came from. If you completed a web form to access the data and selected a subset, describe these steps (including any options you selected) and the date you accessed the data. 
+
+We pulled this dataset from this CDC website: https://wonder.cdc.gov/std.html. This sample data comes from the CDC STI dataset from 2000 - 2014. It was fairly simple to pull this dataset; the link takes the user to a portal after clicking the "Data Request" link where they can fill out the requirements that they want in their dataset such as disease, year, gender, state or region (geography as unit of measurement), and etc. User can also title the dataset, identify the type of measure (e.g., count, population, or rate) then download the file. This sample data was retrieved on February 12, 2021.
+
+The corresponding data set is an aggregated and summarized tabulation from Sexually Transmitted Disease (STD) morbidity case reports  that have been annually reported to the National Center for HIV/AIDS, STD,  Viral Hepatitis, and TB Prevention. The Centers for Disease Control and Prevention, also known as the CDC, collected this data for all 50 United States as well as the District of Columbia, Puerto Rico, Virgin Islands, and the territory of Guam. Before being empirically tabulated, the number of cases and corresponding disease incidence rates were reported by year, the type of STD, and also the area of report. Furthermore, the data was further aggregated by gender, age group, and race/ethnicity.
+
+
+
+#### Set up the packages
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dpi=300,fig.width=8)
+
+x <-
+  c("data.table",
+    "readxl",
+    "dplyr",
+    "broom",
+    "ggplot2",
+    "usethis",
+    "sf",
+    "gridExtra",
+    "knitr",
+    "here")
+
+lapply(x, require, character.only = TRUE)
+#tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
+```
+To load the libraries that we need without repeating the library function, we used the lapply() function in R to load them all at once.
+
+
+##### 5. [1 mark] Write code below to import your data into R. Assign your dataset to an object.
+```{r Import Data}
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+```
+We use the read_xlsx function to read in the data set and specify the excel sheet then assign it to an object called <b>sti_data</b>.
+
+
+#### Question 6
+##### 6. [3 marks] Use code in R to answer the following questions:
+##### i) What are the dimensions of the dataset?
+```{r Question 6i, include = TRUE}
+dim(sti_data) # Returns 23400 rows and 12 columns
+```
+
+
+##### ii) Provide a list of variable names.
+```{r Question 6ii, include = TRUE}
+names(sti_data)
+head(sti_data)
+
+```
+
+
+##### iii) Print the first six rows of the dataset.
+```{r Question 6iii, eval=FALSE}
+head(sti_data)
+```
+
+
+#### Question 7
+##### 7. [4 marks] Use the data to demonstrate a statistical concept from Part I of the course. Describe the concept that you are demonstrating and interpret the findings. This should be a combination of code and written explanation.
+
+We will use ggplot to create a bar chart displaying Chlamydia count stratified by gender and sorted by year. To do this, we first clean the data set by filtering unwanted categorical variables and removing either incomplete or non-numeric entries. For the states of California, New York, and Texas, we have created distributions displaying our target population and stratified data. By grouping onto a single bar chart, we can see that there is clearly a correlation between gender and chlamydia rate, as well as year. Analyzing our results, it is empirically evident that cases are proportionally higher among females than their male counterparts, which can be seen in the total summation of all cases. Additionally, this trend is observable between all 3 states, and as subsequent years are analyzed (2000 - 2014), we can see that female chlamydia cases are of 2.5x more in quantity. There is a clear underlying causal relationship that results in this discrepancy.
+
+We can see, from looking at the below 3 plots as an example, that there is a clear trend between year, gender, and count of cases. Our project will explore this issue by creating a regression model that uses gender, year, and state to predict the probability of a specific disease in each specific state. This will be a very large and comprehensive model due to the fact that we have 24,000 rows consisting of over 10 distinct sexually transmitted diseases in over 50 states. From the plots below, we can see that the left skewed data by year correlates to an increase as year proceeds.The way our data is laid out is already aggregated to rates of chlamydia, so our outcome is a continuous variable - not binary. This works out well because we have a binary exposure and continuous outcome. 
+
+There are two prime statistical concepts that we are demonstrating here. First, by stratifying by geneder and plotting with respect to year, we can see that the relatinshio betweeb year and count of cases is reasonably linear. This can be seen by relatively consistent and linear increases in cases in California as the year progresses. This chart could be represented as a linear regression model, however we would see different slopes with respect to male and female.
+
+The second statistical concept we are demonstraing is that of the risk ratio, which is the ratio of the probability of an outcome in an exposed group to the probability of an outcome in an unexposed group. Assuming our two exposures are being male and female, and the outcome is having chlamydia, we can use the total value of cases stratified by gender computed by R. There are approximately 40 million people in California, roughly equating to 20 million men and 20 million women. We can use the equation 
+$RR = \frac{Risk_{Exposed}}{Risk_{Unexposed}}$. For women, the Relative Risk of contracting Chlamydia in 2014 is 1.76, which supports the fact that women are more at risk for Chlamydia. For men, respectively, this Risk Ratio is 0.5652.
+
+\newpage
+```{r California}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# California
+Data = filter(Data, State == "California")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of California Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="California.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+```
+\newpage
+```{r New York}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# New York
+Data = filter(Data, State == "New York")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of New York Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="NewYork.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+```
+\newpage
+```{r Texas}
+# Package
+require(gridExtra)
+
+# Clone CSV Table
+Data = sti_data
+
+# Filter
+Data = select (Data, State, Year, Count, Gender, Disease)
+
+# Texas
+Data = filter(Data, State == "Texas")
+
+# Chlamydia
+Data = filter(Data, Disease == "Chlamydia")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+
+# Distribution
+P1 = ggplot(Data, aes(x = Year, y = Count, fill = Gender))
+P1 = P1 + geom_bar(stat = "identity", position = "dodge")
+P1 = P1 + labs(title = "Distribution of Texas Chlamydia Cases by Year")
+P1 = P1 + labs(subtitle = "Stratified By Gender", x = "Year", y = "Number of Cases")
+P1 = P1 + theme(legend.position = "none")
+
+# Total
+Data = group_by(Data, Gender)
+Data = summarize(Data, TotalCount = sum(Count))
+P2 = ggplot(Data, aes(x = Gender, y = TotalCount))
+P2 = P2 + geom_bar(stat = "identity",aes(fill = Gender))
+P2 = P2 + labs(title = "Total", x = "Gender", y = "Number of Cases")
+P2 = P2 + theme(axis.title.y = element_blank()) + theme(axis.text.x = element_blank())
+
+# Arrange Into Grid
+Plot <- arrangeGrob(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+
+# Save
+ggsave(Plot, file="Texas.png")
+
+grid.arrange(P1, P2, ncol=2, nrow=1,widths = c(2,1))
+```
+\newpage
+***Data Project Part 2***
+
+#### 1. [1 mark] Include your work for Part I.
+Data Project Part 1 is included above, and is contained on seperate pages. All code, plots, and analysis have not been changed. To ensure that are data is starting, once again, as the pure dataset, the following csv file has been read and imported once more.
+
+```{r Re Import Data}
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+```
+
+#### 2. [2 marks] Describe a quantity you will estimate as an outcome in your problem using probability notation. Are you planning to calculate marginal probabilities? Conditional probabilities?
+There are multiple probabilities that we would like to calculate in our causal analysis. Due to the nature of the problem, a majority of these are conditional probabilities because we are analyzing certain groups and variables as opposed to the margins of our data set. All our probabilities will be focused on Chlamydia.
+
+The first of these probailities will be the conditional probability of Chlamydia incidence in each state given gender. To do this, we will first stratify and create a 2x2 table for all 50 states in order to make our analysis more thorough. Our simple first probability will be that of chlamydia given a gender. When stratifying to make seperate 2x2 tables these would technically be considered marginal probabilities, however our full table contains 50 rows for states and multiple columns for Chlamydia status and gender, so with respect to the entire data set these would still be conditional. This can be written in the form:
+$$ P(Chlamydia | Male) \ \ \mbox{and} \ \ P(Chlamydia | Female)$$
+The next probabilities we would like to calculate are the intersection between states and Chlamydia proportions, which we will want in order to directly compare states ratios to their counterparts. An example of this will be, what is the probability of being in Texas and having Chlamydia? This will be possible due to the fact that our data is tabulated by state and we have individual cases in order to calculate this probability. This can be written in the form:
+$$P(Chlamydia \cap Texas) \ \ \mbox{and} \ \ P(Chlamydia \cap Mississippi)$$
+Finally, we would like to combine the two in order to create stratum specific estimates and probabilities. This will combine both intersection of states and cases as well as gender. This will be written in the form:
+$$P(Chlamydia | Male \cap California) \ \ \mbox{or} \ \ P(Chlamydia | Female \cap Arizona)$$
+\newpage
+
+#### 3. [3 marks] Describe the type of theoretical distribution that is relevant for your data.
+
+#### i) What type of variable(s) are you investigating (continuous, categorical, ordinal, etc)?
+
+There are multiple variables being analyzed in our model.
+
+Year: Year is a number from 2000 to 2014. At first, this could be considered a discrete numeric value, however for the purposes of stratifying each case of chlamydia and seperating data into more manageable chunks, this actually behaves more as a categorical variable due to the fact that we are not performing time series analysis.
+
+State: State contains markers for all 50 states plus certain districts such as the district of Columbia. This is a categorical variable however it is not ordinal because states are not ranked in any important tier based on value. Because of this, we have a nominal categorical variable.
+
+Gender: Gender is either Male, Female, or Unknown which represents data collected for a participant who did not leave a response. These are clearly nominal ordinal variables.
+
+Count: Count is a discrete numeric variable that represents the amount of positive cases of a given sti per state stratified by gender. This is discrete and not continuous because we only work with whole integers.
+
+Population: Population is also a discrete numeric variable.
+
+Proportion: Proportion is the only continuous numeric variable that we have in our data set. It is conitnous because it is typically under 0.01 and falls on an average of typically 0.0036575778. Proportion is always a continuous variable.
+
+#### ii) What theoretical distribution that we have talked about would potentially be appropriate to use with these data (Normal, Binomial, Poisson. . . )\newline
+
+Out of the three choices we have, we decided on the normal distribution being the best fit. This is because of the large quantity of measured data, as well as relative independence between each sample. Below is a plot of our proportions of Chlamydia cases by state. While there is presence of outliers, we have decided that the normal distribution is still the best and most appropriate theoretical distribution for our data.
+
+```{r}
+# Clone CSV Table
+Data = sti_data
+
+# Select Chlamydia
+Data = filter(Data, Disease == "Chlamydia", Gender != "Unknown")
+
+# Remove District Because Data Collectors Stated Errors in These States When Sampling
+Data = filter(Data, State != "District of Columbia")
+Data = filter(Data, State != "Alaska")
+Data = filter(Data, State != "Mississippi")
+
+# Remove NAN
+Data = na.omit(Data)
+
+# Confirm Numeric
+Data = mutate(Data, Count = as.numeric(Count))
+Data = mutate(Data, Population = as.numeric(Population))
+
+# Create Proportion
+Data = mutate(Data, Proportion = Count/Population)
+
+str(Data)
+
+# Plotting
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.0004)
+Plot = Plot + geom_density(col = "green", size = 1.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender)
+Plot
+```
+
+#### iii) Why is this an appropriate model for the data you are studying?
+There are 3 options for a theoretical distribution.
+
+First, we can initially posit that our distribution will most definitely not be Poisson. We can do this for multiple reasons. First, Chlamydia, although still being an STI, is nowhere near rare enough to be considered under the Poisson distribution. Likewise, the odds or probability of infection is not equal for each person, which violates an assumption we need in order to use the Poisson model. Finally, our model is a factor of multiple variables, and we do not have time series data to estimate either the number of cases per week/state, nor do we have a reasonable asusmption that each event of Chlamydia does not influence the chances of another event occuring. By definition, a sexually transmitted disease is transmitted more frequently when there are known to be more positive individuals.
+
+Our second candidate for a distribution is Binomia. At first glance, this would seem like a good choice do to the fact that our outcome is seemingly binary. We either have a 0 (not a case) or a 1 (a chlamydia case). Unfortunately, the Binomal distribution is not viable for multiple reasons. First, we do not have access to individual candidate data. Because of this, we can not determine the probability per person, but only per stata. This would mean that we cannot "choose" a number of people (k) from our sample of size n. Additionally, our model is complex to the point that we cannot simply treat our outcome as binary. Also, we cannot directly assume independence for states, as well as we do not have a fixed sample size to draw from. Our sample is effectively all of the united states. Because of this, we cannot say that we are visualizing a Binomial distribution.
+
+This leaves us with a normal distribution. We posit that the normal distribution is the appropriate theoretical distribution to use. First, we have an accumulutaion of over 1 million sample points that are simplified into a proportion for each state. Because of this, we can assume the mean of our proportional curve to be an unbiased estimator. This means that we can average our proportion and use this mean to be the estimator for average proportion for any given state. Here, we are effectively given an empirical normal distribution. Due to the size of our population, our theoretical distribution is normal due to the fact that we can assume indepencdence from each sample due to variation over state/county. Our theoretical assumption holds true for a few reasons. First, when plotting, we can see that the distribution if approximately symmetric. Second, we can see that it is asymptotic. Finally, we can also see that each distribution, when stratified by gender, is unimodal. Most importantly, our distribution meets the conditions of the 68 -95 - 98 rule, where each proportion of data is within 1,2, and 3 standard distributions respectively.
+
+When examining the true data below, we can see that it is approximately normal. Unfortunately, it seems that for both men and women the distribution is slightly right skewed due to outliers, however this is expected as our data is not perfect and can reflect real life inconsistencies. We also know that each sample is an SRS due to the method in which data was collected. Also looking at the data, we can see that while both are relatively normal, we can see that the standard distribution for women is much greater than that of men. This means that there is more variance in the female population. We can see this by the higher and less wide curve when stratified by gender and examining the male population.
+
+\newpage
+#### 4. [4 marks] Use the data you have to demonstrate a statistical concept from Part II of the course. Describe the concept that you are demonstrating and interpret the findings. This may include code in R, a visual of some kind and text interpretation.
+
+Below, We started with very simple calculations to understand our sampling proportion. We once again included our histogram to show normality of our data. From our tabulated values, we calculated a mean proportion for Females of 0.004975239 with a standard deviation of 0.0015581734. For Males, we calculated a mean proportion of 0.001778095 with a standard deviation of 0.0006937979 Looking at our theoretical distributions overlayed on the histogram, this very clearly explains the difference we see in each of their shapes. For Femails, the proportion of Chlamydia distributions is much wider and resembles the more typical standard normal curve. For males, we see an extremeley high peak with narrow variance which represents a smaller 95% confidence interval. The data tabulated supports and explains the visual assumptions we made. Next, we calculated a 95% margin of error corresponding to a 95% Confidence Interval of $0.004975239 \pm 0.0001126492$ for Women and a 95% Confidence Interval of $0.001778095 \pm 0.0000501586$ for Males.
+
+```{r}
+
+# By Gender
+Inference_Data = group_by(Data, Gender)
+Summary_Gender = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+Summary_Gender
+
+# By State
+Inference_Data = group_by(Data, State)
+Summary_State = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+print.data.frame(Summary_State)
+
+# Plot
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.0004)
+Plot = Plot + geom_density(col = "green", size = 1.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender)
+Plot
+
+```
+
+Ultimately, our goal is to create a t-test to test a desired null hypothesis, however before we do this, it is important to define normality of our plot. We can still use the t-test, however first we will create a QQ plot in order to analyze how well our data fits a normal curve. We will do this so we can visually determine the fit of our data in a method separate to simply looking at a histogram. Looking at the calculated QQ plots displayed, we can immediately see that our data is not perfectly normal. This is unfortunate, however we did not expect our data to be perfect. Looking at the quantile plots, we can see that they reinforce our initial observation of right-skewed data. For Females, the proportion is relatively normal before 3rd quartile/95% range where we lose normality drastically. This can bee seen in the histogram where data is skewed right. For Males, we can also see in the QQ plot that the data is not pefectly normal, in fact past the +2 quartile as well it is clear that the data is right skewed. Thankfully, we can confidently say that the *bulk* of the data, that mostly contained within the 95% confidence interval, is relatively normally distributed. The QQ plot is an important tool that can be used to interpret and define normality.
+
+```{r}
+QQ_Plot = ggplot(data = Data, aes(sample = Proportion)) 
+QQ_Plot = QQ_Plot + stat_qq() + stat_qq_line() 
+QQ_Plot = QQ_Plot + facet_wrap(~ Gender)
+QQ_Plot
+```
+Our next step is conducting a t-test. A t-test is a type of inferential statistic used in lecture to determine if there is a variance or significant deviation between the means of two groups, which in this case, is the mean of the sampling proportion of Chlamydia. This difference in mean is calculated using the t-test which may be related in certain features. The t-test is one of many tests used by statisticians and Public Health professionals for the purpose of hypothesis testing. There are multiple conditions that we must satisfy first before conducting a t-test. First, data must be from a SRS. Due to the method in which our data was sample (volunteered information) as well as the sheer size and scope of the CDC data, we can conclude that all samples were independent and this can be approximated as a SRS. Second, the data must be normally distributed and must be uni modal and symmetric. Using the QQ plot and histogram above, we can conclude that our data is relatively normal and can meet this condition. The 3rd and final condition is that our data must be of a "large" sample size. In lecture this was defined as anything greater than or equal to 40. We have data from 50 states, and each state has tens of thousands of cases. Thus, we clearly meet this condition with at least a million separate samples. One important factor we have to consider is skewed data. While our data definitely does have some right skewed behavior, we do not consider it major and can proceed with the t-test.
+
+Our t-test will be as follows. Based on our statistical analysis, we concluded that the mean proportion of Chlamydia over every state for Women was 0.004975239 and for Men was 0.001778095 Earlier in the problem, we made the decision to remove the categorical variable in state labeled "District of Colombia" because we wanted to focus or causal study on only the 50 states in America, not include a district. We also made the decision to remove this due to the fact that the sample size was relatively small compared to any other state, and it simply did not seem like a subset of the population that we could use to infer more about another state. This proportion is too small to effect the overall sampling mean due to the fact that it is only 1 of 50 states and only accounted for 40 out of the 400,000 + samples. Additionally, we wanted to remove this sample so we could reintroduce it later in order to run statistical analysis now. Focusing on the sampling from the District of Colombia, we see an average sampling proportion for women of 0.011115789, and an average sampling proportion of 0.004888704 for men. This is much higher than those seen as an average over all 50 states.
+
+```{r}
+District_Data = read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+
+# Filter for Chlamydia
+District_Data = filter(District_Data, Disease == "Chlamydia", Gender != "Unknown")
+
+# Remove NAN
+District_Data = na.omit(District_Data)
+
+# Confirm Numeric
+District_Data = mutate(District_Data, Count = as.numeric(Count))
+District_Data = mutate(District_Data, Population = as.numeric(Population))
+
+# Create Proportion
+District_Data = mutate(District_Data, Proportion = Count/Population)
+
+# Focus on District of Columbia
+District_Data = filter(District_Data, State == "District of Columbia")
+
+Inference_Data_District = group_by(District_Data, Gender)
+Summary = summarize(Inference_Data_District, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+Summary
+```
+
+However, is it an abnormally high sampling proportion? We would like to test the hypothesis that a mean sampling proportion for Chlamydia in the District of Colombia is actually abnormally high. To do this, we will test this against the null hypothesis that the mean is actually eaqual to the overall sampling proportion of 0.004975239 and 0.001778095 respectively. We will do this using a T-Test. Our Null Hypothesis is $H_0: \bar{p} = 0.004975239$ for women and $H_0: \bar{p} = 0.001778095$ for men. Our alternative hypothesis is $H_A: \bar{p} > 0.004975239$ for women and $H_A: \bar{p} > 0.001778095$ for men.
+
+```{r}
+# Stratify Data By Gender
+Male_Data = filter(District_Data, Gender == "Male")
+Female_Data = filter(District_Data, Gender == "Female")
+
+# Run T-Test
+Male_T_Test = t.test(x = Male_Data$Proportion, alternative = "greater", mu = 0.001778095)
+Female_T_Test = t.test(x = Female_Data$Proportion, alternative = "greater", mu = 0.004975239)
+```
+
+Running the T-Test on the Male proportion of the gender, we have a P-Value of 0.0005109 as our test statistic. This means that there is a 0.05109% chance that we observed this deviation of proportion in the District of Colombia due to chance. Because of this, we reject the null hypothesis and accept the fact that our data is accurate in this district. If we were to incorrectly make this estimate, then that would be a type 1 error which is an $\alpha$ error. What is our statistical power here? Using the normal distribution, we can determine what our power is using pnorm() using an $\alpha = 0.05$ which corresponds to 95%. Our power here is calculated as 0.8466444.
+```{r}
+District_Probability = 1 - pnorm(0.001906643, mean = 0.004888704, sd = 0.002917447)
+District_Probability
+
+Male_T_Test
+```
+Running the T-Test on the Female proportion of the gender, we have a P-Value of 3.456e-09 as our test statistic. This means that there is a 3.456e-07% chance that we observed this deviation of proportion in the District of Colombia due to chance. Because of this, we reject the null hypothesis and accept the fact that our data is accurate in this district. If we were to incorrectly make this estimate, then that would be a type 1 error which is an $\alpha$ error. What is our statistical power here? Using the normal distribution, we can determine what our power is using pnorm() using an $\alpha = 0.05$ which corresponds to 95%. Our power here is calculated as 0.9985881.
+```{r}
+
+District_Probability = 1 - pnorm(0.005334928, mean = 0.011115789, sd = 0.001935802)
+District_Probability
+
+
+Female_T_Test
+```
+
+*PART 3*
+```{r}
+# Clone CSV Table
+library(readxl)
+
+sti_data <- read_excel("/sti_data.xlsx", sheet = "2000-2014")
+
+str(sti_data)
+
+# Select relevant columns and filter by Chlamydia excluding unknown genders
+df <-
+  sti_data %>%
+  select(ID, State, Gender, Disease, Count, Population, Rate) %>%
+  filter(Gender != "Unknown", Disease=="Chlamydia") %>% 
+  mutate(
+    Count = as.numeric(Count),
+    Population = as.numeric(Population),
+    Proportion = Count / Population)
+
+View(df)
+
+# Remove District Because Data Collectors Stated Errors in These States When Sampling then Remove NAN
+df2 <-  filter(df, State != "District of Columbia", State != "Alaska", State != "Mississippi") %>% na.omit(df)
+
+# Confirm Numeric (removing this since it's in line 437)
+#Data = mutate(Count = as.numeric(Count), Population = as.numeric(Population))
+
+# Create Proportion (see line 37)
+#Data = mutate(Data, Proportion = Count/Population)
+
+show <- Data %>% group_by(Disease, Gender) %>% mutate(Rate=as.numeric(Rate)) %>% filter(Disease=='Chlamydia') %>% summarize(TotalCount = sum(Count), TotalPop = sum(Population), TotalRate = sum(Rate)) 
+
+show #table with the totals
+
+dfframe <- data.frame(Gender = c("Female_w_C", "Male_w_C"), count=c(13529616, 4774545), pop=c(2535475282,2464469983), prop=c(13529616 /  2535475282, 4774545 / 2464469983))
+
+dfframe 
+prop.test(x=c(13529616, 4774545), n=c(13529616 + 2535475282 , 4774545 + 2464469983)) #p-value < 2.2e-16
+
+
+# Plotting
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.000055,color='black',fill='black')
+Plot = Plot + geom_density(col = "red", size = 2.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(subtitle = "Stratified by Gender (Male or Female)")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender,scales = "free")
+Plot = Plot + theme_classic()
+Plot
+
+# QQ Plot
+QQ_Plot = ggplot(data = Data, aes(sample = Proportion)) 
+QQ_Plot = QQ_Plot + stat_qq() + stat_qq_line() 
+QQ_Plot = QQ_Plot + facet_wrap(~ Gender)
+QQ_Plot = QQ_Plot + theme_classic()
+QQ_Plot
+
+# Confidence Intervals
+Inference_Data = group_by(Data, Gender)
+Summary_Gender = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+tibble(Summary_Gender)
+```
