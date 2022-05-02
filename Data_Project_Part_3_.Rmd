@@ -1,0 +1,192 @@
+---
+title: "Data Project Part 1"
+author: Carri Beshears, Samantha Sears, Samuel Johnson, Catalina Perez, and Phuong
+  Tseng
+date: "2022/2/12"
+output:
+  pdf_document: default
+  html_document: default
+header-includes: \usepackage{epsfig,graphicx,graphics,amssymb,amsmath,latexsym,amsfonts,url,
+  lscape, multirow, color}
+---
+***Data Project Part 1***
+
+Research Question: Do women in CA have <b>higher rates</b> of Chlamydia than men? 
+You can find our analysis on Github: [https://github.com/phtseng/PBHLTH_142_Group/blob/master/Data_Project_Part_1.Rmd]
+
+1. [2 marks] Identify a statistical test to apply to your data (must be a concept we covered in part III of the course). In plain language, write the question you are trying to answer.
+
+Chlamydia rates continue to climb in the United States each year, according to the CDC. Is there a 
+difference of disease prevalence among individuals that identify as women and individuals that identify as men in the 
+United States between the years of 2000 and 2014? To start to answer this question, we will conduct a
+two-sample t-test for proportions comparing aggregated data from each state. Chlamydia 
+cases that were entered with an “unknown” gender will be removed from this analysis due poor clarity of 
+Its meaning.  
+
+2. [2 marks] What assumptions are required by the method you chose in 5.1?
+Show how you assessed whether these assumptions are met by your dataset.
+
+Independent populations, simple random sampling and a large sample size are required 
+for the two sample t-test for proportions statistical  test.
+
+The sampling frame used CDC STI data from 2000-2014 which consists of aggregated data reported 
+to the CDC from trustworthy and validated sources. The participants are randomly selected using 
+simple random sampling. This method for probability sampling ensures that every man or woman 
+within the population has the same probability of being selected for the study. Therefore, the process for choosing a person is not biased. Also, random samples are from independent populations. 
+The study sample size is large which ensures the distribution of the proportion is normally distributed.
+
+3. [2 marks] Explain why this test is appropriate for the data you have and the question you are trying
+to answer. 
+
+The two sample t-test for proportions is appropriate for this data set because we are comparing the portions of 2 distinct populations within our data set. Our proportions are derived from a large sample size, has an approximately normal distribution, and represents all cases reported in the US during 2000-2014. 
+
+4. [2 marks] Clearly state the null and alternative hypotheses for this test.
+
+H0: There is no difference between the proportion of chlamydia seen in men and women in the United States during 2000-2014
+
+P1 = p2 | p1 - p2 = 0
+
+Ha: There is a difference between the proportion of chlamydia seen in men and women in the United States during 2000-2014
+
+P1 != p2 | p1 - p2 != 0 (two-sided)
+
+5. [2 marks] Include the R code you used to generate your results. Annotate your code to help us follow
+your reasoning.
+
+6. [4 marks] Present your results in a clear summary. This should include both a text summary and a
+table or figure with appropriate labeling.
+
+
+7. [4 marks] Interpret your findings. Include a statement about the evidence, your conclusions, and the
+generalizability of your findings.
+Additional studies should be done. Only two genders included, no inclusion of MSM or FSF. 
+
+
+#### Set up the packages
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dpi=300,fig.width=8)
+
+x <-
+  c("data.table",
+    "readxl",
+    "dplyr",
+    "broom",
+    "ggplot2",
+    "usethis",
+    "sf",
+    "gridExtra",
+    "knitr",
+    "here")
+
+lapply(x, require, character.only = TRUE)
+#tinytex::install_tinytex() #To load tinytext() so we can knit to Word document
+```
+To load the libraries that we need without repeating the library function, we used the lapply() function in R to load them all at once.
+
+
+*Data Project PART 3*
+
+#### Import Data
+```{r Import Data}
+sti_data <- read_xlsx("sti_data.xlsx", sheet = "2000-2014")
+```
+We use the read_xlsx function to read in the data set and specify the excel sheet then assign it to an object called <b>sti_data</b>.
+
+#### Data Cleaning
+```{r Clean Data for Analysis}
+df <-
+  sti_data %>%
+  select(ID, State, Gender, Disease, Count, Population, Rate) %>%
+  filter(Gender != "Unknown", Disease=="Chlamydia") %>% 
+  mutate(
+    Count = as.numeric(Count),
+    Population = as.numeric(Population),
+    Proportion = Count / Population)
+
+```
+We use the dplyr library and pipe operator to select the relevant columns then filter our records to remove "unknown" gender then create the count and population.
+
+#### Data Cleaning Continue
+```{r Remove Districts from dataset}
+# Remove District Because Data Collectors Stated Errors in These States When Sampling then Remove NAN
+df2 <-  filter(df, State != "District of Columbia", State != "Alaska", State != "Mississippi") %>% na.omit(df)
+
+# Confirm Numeric (removing this since it's in line 437)
+#Data = mutate(Count = as.numeric(Count), Population = as.numeric(Population))
+
+# Create Proportion (see line 37)
+#Data = mutate(Data, Proportion = Count/Population)
+```
+
+#### Question 5 
+[2 marks] Include the R code you used to generate your results. Annotate your code to help us follow your reasoning.
+
+```{r Question 5}
+
+show <- df2 %>% group_by(Disease, Gender) %>% mutate(Rate=as.numeric(Rate)) %>% filter(Disease=='Chlamydia') %>% summarize(TotalCount = sum(Count), TotalPop = sum(Population), TotalRate = sum(Rate)) 
+
+show #table with the totals
+
+dfframe <- data.frame(Gender = c("Female_w_C", "Male_w_C"), count=c(13529616, 4774545), pop=c(2535475282,2464469983), prop=c(13529616 /  2535475282, 4774545 / 2464469983))
+
+dfframe 
+
+p_hat <- (13529616 + 4774545)/(2535475282 + 2464469983) #p_hat 0.003660872
+SE <-  0.003660872*(1-0.003660872)*((1/2535475282) + (1/2464469983))
+z_stat <- (0.005336126 - 0.001937352)/ 0.000000000002918597
+z_stat <- 1164523228
+p_value <- pnorm(q = 1164523228, lower.tail = F) * 2
+
+prop.test(x=c(13529616, 4774545), n=c(2535475282 , 2464469983), correct = F) 
+#p-value < 2.2e-16
+
+
+
+```
+
+     prop 1      prop 2 
+0.005336126 0.001937352 
+
+
+#### Question 6 
+[4 marks] Present your results in a clear summary. This should include both a text summary and a table or figure with appropriate labeling.
+```{r Question 6}
+Data <-  df2
+
+# Plotting
+Plot = ggplot(data = Data, aes(x = Proportion))
+Plot = Plot + geom_histogram(aes(y = stat(density)), binwidth = 0.000055,color='black',fill='grey')
+Plot = Plot + geom_density(col = "red", size = 2.5)
+Plot = Plot + labs(title = "Distribution of Proportion of Chlamydia Cases for Each State")
+Plot = Plot + labs(subtitle = "Stratified by Gender (Male or Female)")
+Plot = Plot + labs(x = "Sampling Proportion of Cases")
+Plot = Plot + labs(y = "Count")
+Plot = Plot + facet_wrap(~ Gender,scales = "free")
+Plot = Plot + theme_classic()
+Plot
+
+# QQ Plot
+QQ_Plot = ggplot(data = Data, aes(sample = Proportion)) 
+QQ_Plot = QQ_Plot + stat_qq() + stat_qq_line() 
+QQ_Plot = QQ_Plot + facet_wrap(~ Gender)
+QQ_Plot = QQ_Plot + theme_classic()
+QQ_Plot
+
+# Confidence Intervals
+Inference_Data = group_by(Data, Gender)
+Summary_Gender = summarize(Inference_Data, Prop = mean(Proportion), Standard = sd(Proportion), Margin_95 = 1.96*Standard/sqrt(n()), Lower = Prop - Margin_95, Upper = Prop + Margin_95)
+tibble(Summary_Gender)
+```
+
+#### Question 7 
+[4 marks] Interpret your findings. Include a statement about the evidence, your conclusions, and the
+generalizability of your findings.
+Additional studies should be done. Only two genders included, no inclusion of MSM or FSF. 
+
+```{r Question 7}
+
+```
+
+
+
